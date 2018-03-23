@@ -1,0 +1,4 @@
+﻿  main.cpp
+d:\programming\github\mediadesignschool\programming\week4\disallowcopies\main.cpp(7): warning C4101: 'object2': unreferenced local variable
+d:\programming\github\mediadesignschool\programming\week4\disallowcopies\main.cpp(8): warning C4101: 'object3': unreferenced local variable
+  DisallowCopies.vcxproj -> D:\Programming\GitHub\mediadesignschool\Programming\Week4\Debug\DisallowCopies.exe

@@ -1,0 +1,7 @@
+﻿  Vector3.cpp
+d:\programming\github\mediadesignschool\programming\week4\vectoroperations\vector3.h(83): error C2801: 'Vector3::operator *' must be a non-static member
+d:\programming\github\mediadesignschool\programming\week4\vectoroperations\vector3.h(83): error C2333: 'Vector3::operator *': error in function declaration; skipping function body
+  main.cpp
+d:\programming\github\mediadesignschool\programming\week4\vectoroperations\vector3.h(83): error C2801: 'Vector3::operator *' must be a non-static member
+d:\programming\github\mediadesignschool\programming\week4\vectoroperations\vector3.h(83): error C2333: 'Vector3::operator *': error in function declaration; skipping function body
+  Generating Code...
