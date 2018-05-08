@@ -34,8 +34,10 @@ HINSTANCE globalHandleToInstance;
 Canvas* globalCanvas;
 IShape* globalShape = nullptr;
 HMENU globalMenu;
+myShape::Polygon* polygon;
 
-int mouseX1, mouseY1;
+// bool mouseDown = false;
+int mouseX, mouseY;
 
 //Enum to decalre the type of tool supported by the application.
 enum ESHAPE
@@ -51,7 +53,8 @@ enum ESHAPE
 
 void GameLoop()
 {
-	globalCanvas->Draw(mouseX1, mouseY1);
+	globalCanvas->Draw(mouseX, mouseY);
+	
 	//One frame of game logic occurs here...
 }
 
@@ -64,6 +67,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 	PAINTSTRUCT paintStruct; // Used in WM_PAINT.
 	HDC hdc;        // Handle to a device context.
 	static ESHAPE currentShape = FREEHAND;
+	
 	switch (message)
 	{
 	case WM_CREATE:
@@ -81,12 +85,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 	{
 		hdc = BeginPaint(hwnd, &paintStruct);
 
-		// You would do all your painting here...
-		hdc = GetDC(hwnd);
-
-		
-
-		ReleaseDC(hwnd, hdc);
+		if(globalCanvas != nullptr)
+		globalCanvas->Draw(mouseX, mouseY);
 		
 		EndPaint(hwnd, &paintStruct);
 		// Return Success.
@@ -99,12 +99,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 	case WM_LBUTTONDOWN:
 	{
 		// Get the position of the mouse
-		int mouseX = static_cast<int>(LOWORD(lParam));
-		int mouseY = static_cast<int>(HIWORD(lParam));
-
-			// Set Mouse coordinates
-			mouseX1 = mouseX;
-			mouseY1 = mouseY;
+		mouseX = static_cast<int>(LOWORD(lParam));
+		mouseY = static_cast<int>(HIWORD(lParam));
+		// mouseDown = true;
 
 			switch (currentShape)
 			{
@@ -112,18 +109,55 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			{
 				if (!globalShape)
 				{
-					globalShape = new Line(PS_SOLID, 1, RGB(0, 0, 0), mouseX, mouseY);
+					globalShape = new myShape::Line(PS_SOLID, 1, RGB(0, 0, 0), mouseX, mouseY); 
 					globalCanvas->AddShape(globalShape);
 				}
-				
 			}
 			break;
+
+			case RECTANGLESHAPE:
+			{
+				if (!globalShape)
+				{
+					globalShape = new myShape::Rectangle(NOSTYLE, 1, RGB(0, 0, 0), 0, RGB(0, 0, 0), mouseX, mouseY);
+					globalShape->SetEndX(mouseX);
+					globalShape->SetEndY(mouseY);
+					globalCanvas->AddShape(globalShape);
+				}
+			}
+			break;
+
+			case ELLIPSESHAPE:
+			{
+				if (!globalShape)
+				{
+					globalShape = new myShape::Ellipse(RGB(0, 0, 0), mouseX, mouseY);
+					globalShape->SetEndX(mouseX);
+					globalShape->SetEndY(mouseY);
+					globalCanvas->AddShape(globalShape);
+				}
+			}
+
+			case POLYGONSHAPE:
+			{
+				if (!globalShape)
+				{
+					globalShape = new myShape::Polygon(1, RGB(0, 0, 0), 1, RGB(0, 0, 0), 1);
+					globalShape->SetEndX(mouseX);
+					globalShape->SetEndY(mouseY);
+					globalCanvas->AddShape(globalShape); // TODO Add Points somewhere
+
+				}
+
+			}
+
 			default:
 			{
 				break;
 			}
 		
 			}
+			InvalidateRect(hwnd, NULL, TRUE);
 			// Return success.
 			return (0);
 
@@ -132,27 +166,44 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 
 	case WM_LBUTTONUP:
 	{
+		mouseX = static_cast<int>(LOWORD(lParam));
+		mouseY = static_cast<int>(HIWORD(lParam));
+
+		// mouseDown = false;
+		if (globalShape)
+		{
+			globalShape->SetEndX(mouseX);
+			globalShape->SetEndY(mouseY);
+			//InvalidateRect(hwnd, NULL, TRUE);			
+		}
+
+
 		globalShape = nullptr;
+
+
+		
+		return (0);
 	}
+	break;
 
 	case WM_MOUSEMOVE:
 	{
 		// Get the position of the mouse
-		int mouseX = static_cast<int>(LOWORD(lParam));
-		int mouseY = static_cast<int>(HIWORD(lParam));
+		mouseX = static_cast<int>(LOWORD(lParam));
+		mouseY = static_cast<int>(HIWORD(lParam));
 
 		// Get the button state
-		int buttons = static_cast<int>(wParam);
+		// int buttons = static_cast<int>(wParam);
 
 		// Test if left mouse button is down
-		if (buttons & MK_LBUTTON)
+		if (MK_LBUTTON)
 		{
-			if (globalShape)
+			if (globalShape != nullptr)
 			{
 				globalShape->SetEndX(mouseX);
 				globalShape->SetEndY(mouseY);
+				InvalidateRect(hwnd, NULL, TRUE);
 			}
-			
 		}
 
 		// Return success.
@@ -171,14 +222,30 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 		}
 		case ID_HELP_ABOUT:
 		{
-			MessageBox(hwnd, L"This paint tool was developed by .............", L"Author Information", MB_OK | MB_ICONINFORMATION);
+			MessageBox(hwnd, L"This paint tool was developed by .............", L"Zsombor Pirok", MB_OK | MB_ICONINFORMATION);
 			break;
 		}
 		case ID_SHAPE_LINE:
 		{
 			currentShape = ESHAPE::LINESHAPE;
+			break;
 		}
-		break;
+		case ID_SHAPE_R:
+		{
+			currentShape = ESHAPE::RECTANGLESHAPE;
+			break;
+		}
+		case ID_SHAPE_ELLIPSE:
+		{
+			currentShape = ESHAPE::ELLIPSESHAPE;
+			break;
+		}
+		case ID_SHAPE_POLYGON:
+		{
+			currentShape = ESHAPE::POLYGONSHAPE;
+		}
+
+
 		default:
 			break;
 		}
@@ -275,7 +342,7 @@ int WINAPI WinMain(HINSTANCE handleToInstance,
 		}
 
 		// Main game processing goes here.
-		GameLoop(); //One frame of game logic occurs here...
+		//GameLoop(); //One frame of game logic occurs here...
 	}
 
 	// Return to Windows like this...

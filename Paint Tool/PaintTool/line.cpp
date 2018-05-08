@@ -1,6 +1,6 @@
 #include "line.h"
 
-Line::Line(int style, int width, COLORREF newColour, int startX, int startY)
+myShape::Line::Line(int style, int width, COLORREF newColour, int startX, int startY)
 {
 	this->style = style;
 	this->width = width;
@@ -9,21 +9,21 @@ Line::Line(int style, int width, COLORREF newColour, int startX, int startY)
 	this->startY = startY;
 }
 
-Line::Line()
+myShape::Line::Line()
 {
 }
 
-Line::~Line()
+myShape::Line::~Line()
 {
 }
 
-void Line::Draw(HDC hdc)
+void myShape::Line::Draw(HDC hdc)
 {
 	MoveToEx(hdc, startX, startY, NULL); // Draw the line... 
 	LineTo(hdc, endX, endY);
 }
 
-void Line::SetWidth(int width)
+void myShape::Line::SetWidth(int width)
 {
 	this->width = width;
 }

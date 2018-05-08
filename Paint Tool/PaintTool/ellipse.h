@@ -22,19 +22,24 @@
 
 #include "shape.h"
 
-class Ellipse : public IShape
+namespace myShape
 {
-public:
-	Ellipse(COLORREF _newColor, int, int);
-	Ellipse();
-	virtual ~Ellipse();
+	class Ellipse : public IShape
+	{
+	public:
+		Ellipse(COLORREF newColor, int x, int y);
+		Ellipse();
+		virtual ~Ellipse();
 
-	virtual void Draw(HDC _hdc);
-	void SetColor(COLORREF _newColor);
+		virtual void Draw(HDC hdc);
+		void SetColor(COLORREF newColor);
 
 
-private:
-	COLORREF m_Color;
-};
+	private:
+		COLORREF color;
+	};
+}
+
+
 
 #endif

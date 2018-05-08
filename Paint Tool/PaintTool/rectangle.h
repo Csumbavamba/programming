@@ -18,8 +18,8 @@
 //	Library Includes
 #include <windows.h>
 #include <windowsx.h>
-#include "shape.h"
 
+#include "shape.h"
 
 enum BRUSHSTYLE
 {
@@ -28,28 +28,33 @@ enum BRUSHSTYLE
 	HATCH
 };
 
-class Rectangle : public IShape
+namespace myShape
 {
-public:
-	Rectangle(BRUSHSTYLE _iBrushStyle, int _iHatchStyle, COLORREF _FillColor, int _iPenStyle, COLORREF _PenColor, int _X, int _Y);
-	Rectangle();
-	virtual ~Rectangle();
+	class Rectangle : public IShape
+	{
+	public:
+		Rectangle(BRUSHSTYLE brushStyle, int hatchStyle, COLORREF fillColor, int penStyle, COLORREF penColor, int x, int y);
+		Rectangle();
+		virtual ~Rectangle();
 
-	virtual void Draw(HDC _hdc);
-	void SetBrushStyle(BRUSHSTYLE _brushStyle);
-	void SetFillColor(COLORREF _newColor);
-	void SetPenStyle (int _iPenStyle);
-	void SetPenColor(COLORREF _newColor);
-	void SetHatchStyle(int _iHatchStyle);
-	
+		virtual void Draw(HDC hdc);
+		void SetBrushStyle(BRUSHSTYLE brushStyle);
+		void SetFillColor(COLORREF newColor);
+		void SetPenStyle(int penStyle);
+		void SetPenColor(COLORREF newColor);
+		void SetHatchStyle(int hatchStyle);
 
-private:
-	BRUSHSTYLE m_iBrushStyle;
-	int m_iHatchStyle;
-	COLORREF m_iFillColor;
-	int m_iPenStyle;
-	int m_iPenColor;
-	COLORREF m_Color;
-};
+
+	private:
+		BRUSHSTYLE brushStyle;
+		int hatchStyle;
+		COLORREF fillColor;
+		int penStyle;
+		int penColor;
+		COLORREF color;
+	};
+}
+
+
 
 #endif

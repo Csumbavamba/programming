@@ -7,6 +7,10 @@ Canvas::Canvas()
 
 Canvas::~Canvas()
 {
+	for (int i = 0; i < vectorOfShapes.size(); i++)
+	{
+		delete vectorOfShapes.at(i);
+	}
 }
 
 bool Canvas::Initialise(HWND hwnd, int width, int height)

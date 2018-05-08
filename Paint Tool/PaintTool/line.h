@@ -21,23 +21,27 @@
 
 #include "shape.h"
 
-class Line : public IShape
+namespace myShape
 {
-public:
-	//Line(int _iStartX, int _iStartY, int _iEndX, int _iEndY, COLORREF _newColour, int _iStyle, int _iWidth); 
-	Line(int style, int width, COLORREF newColour, int startX, int startY);
-	Line();
-	virtual ~Line();
+	class Line : public IShape
+	{
+	public:
+		//Line(int _iStartX, int _iStartY, int _iEndX, int _iEndY, COLORREF _newColour, int _iStyle, int _iWidth); 
+		Line(int style, int width, COLORREF newColour, int startX, int startY);
+		Line();
+		virtual ~Line();
 
-	virtual void Draw(HDC hdc);
-	void SetWidth(int width);
-	
+		virtual void Draw(HDC hdc);
+		void SetWidth(int width);
 
-private:
-	
-	int style;
-	int width;
-	COLORREF colour;
-};
+
+	private:
+
+		int style;
+		int width;
+		COLORREF colour;
+	};
+}
+
 
 #endif

@@ -21,27 +21,32 @@
 
 #include "shape.h"
 
-class Polygon : public IShape
+namespace myShape
 {
-public:
-	Polygon(int _iHatchStyle, COLORREF _FillColor, int _iPenStyle, COLORREF _PenColor, int _iPenWidth);
-	Polygon();
-	virtual ~Polygon();
+	class Polygon : public IShape
+	{
+	public:
+		Polygon(int hatchStyle, COLORREF fillColor, int penStyle, COLORREF penColor, int penWidth);
+		Polygon();
+		virtual ~Polygon();
 
-	virtual void Draw(HDC _hdc);
-	void SetFillColor(COLORREF _newColor);
-	void SetPenColor(COLORREF _newColor);
-	void AddPoint(POINT p);
+		virtual void Draw(HDC hdc);
+		void SetFillColor(COLORREF newColor);
+		void SetPenColor(COLORREF newColor);
+		void AddPoint(POINT point);
 
 
-private:
-	COLORREF m_iFillColor;
-	COLORREF m_iPenColor;
-	POINT* m_pPointList;
-	int m_nPoints;
-	int m_iFillStyle;
-	int m_iPenStyle;
-	int m_iPenWidth;
-};
+	private:
+		COLORREF fillColor;
+		COLORREF penColor;
+		POINT* pointList;
+		int points;
+		int hatchStyle;
+		// int fillStyle;
+		int penStyle;
+		int penWidth;
+	};
+}
+
 
 #endif
