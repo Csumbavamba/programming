@@ -1,12 +1,2 @@
 ﻿  main.cpp
-  Generating Code...
-  Compiling...
-  polygon.cpp
-  line.cpp
-  ellipse.cpp
-  canvas.cpp
-  Rectangle.cpp
-  Generating Code...
-  Skipping... (no relevant changes detected)
-  shape.cpp
-  PaintTool.vcxproj -> H:\MDS GitHub\programming\Paint Tool\x64\Debug\PaintTool.exe
+  PaintTool.vcxproj -> D:\Programming\GitHub\programming\Paint Tool\x64\Debug\PaintTool.exe

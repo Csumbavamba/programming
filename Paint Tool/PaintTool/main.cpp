@@ -34,7 +34,7 @@ HINSTANCE globalHandleToInstance;
 Canvas* globalCanvas;
 IShape* globalShape = nullptr;
 HMENU globalMenu;
-myShape::Polygon* polygon;
+myShape::Polygon * polygon;
 
 // bool mouseDown = false;
 int mouseX, mouseY;
@@ -67,6 +67,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 	PAINTSTRUCT paintStruct; // Used in WM_PAINT.
 	HDC hdc;        // Handle to a device context.
 	static ESHAPE currentShape = FREEHAND;
+	static int currentPolygonPoints = 0;
 	
 	switch (message)
 	{
@@ -94,7 +95,29 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 	}
 	break;
 
+	case WM_RBUTTONDOWN:
+	{
+		if (currentShape == POLYGONSHAPE && globalShape != nullptr)
+		{
 
+			polygon = dynamic_cast<myShape::Polygon*>(globalShape);
+
+			polygon->SetEndX(mouseX);
+			polygon->SetEndY(mouseY);
+
+			POINT * point = new POINT();
+			polygon->AddPoint(point);
+			currentPolygonPoints++;
+		}
+		return (0);
+	}
+
+	case WM_RBUTTONDBLCLK:
+	{
+		globalShape = nullptr;
+		return (0);
+	}
+	break;
 
 	case WM_LBUTTONDOWN:
 	{
@@ -137,6 +160,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 					globalCanvas->AddShape(globalShape);
 				}
 			}
+			break;
 
 			case POLYGONSHAPE:
 			{
@@ -148,8 +172,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 					globalCanvas->AddShape(globalShape); // TODO Add Points somewhere
 
 				}
-
 			}
+			break;
 
 			default:
 			{
@@ -177,8 +201,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			//InvalidateRect(hwnd, NULL, TRUE);			
 		}
 
-
-		globalShape = nullptr;
+		if (currentShape != POLYGONSHAPE)
+			globalShape = nullptr;
 
 
 		
@@ -243,6 +267,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 		case ID_SHAPE_POLYGON:
 		{
 			currentShape = ESHAPE::POLYGONSHAPE;
+			break;
 		}
 
 

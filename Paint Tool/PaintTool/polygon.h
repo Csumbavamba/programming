@@ -33,7 +33,7 @@ namespace myShape
 		virtual void Draw(HDC hdc);
 		void SetFillColor(COLORREF newColor);
 		void SetPenColor(COLORREF newColor);
-		void AddPoint(POINT point);
+		void AddPoint(POINT * point);
 
 
 	private:
