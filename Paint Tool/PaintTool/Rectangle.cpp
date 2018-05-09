@@ -24,8 +24,19 @@ myShape::Rectangle::~Rectangle()
 
 void myShape::Rectangle::Draw(HDC hdc)
 {
+	SelectObject(hdc, GetStockObject(DC_PEN));
+
+	SetDCPenColor(hdc, penColor);
+
+
+	SelectObject(hdc, GetStockObject(DC_BRUSH));
+
+	SetDCBrushColor(hdc, fillColor);
+
+
 	//MoveToEx(hdc, startX, startY, NULL); // Draw Rectangle
 	::Rectangle(hdc, startX, startY, endX, endY);
+
 }
 
 void myShape::Rectangle::SetBrushStyle(BRUSHSTYLE brushStyle)

@@ -35,6 +35,8 @@ Canvas* globalCanvas;
 IShape* globalShape = nullptr;
 HMENU globalMenu;
 myShape::Polygon * polygon;
+COLORREF penColor = RGB(0, 0, 0);
+COLORREF brushColor = RGB(255, 255, 255);
 
 // bool mouseDown = false;
 int mouseX, mouseY;
@@ -49,6 +51,9 @@ enum ESHAPE
 	POLYGONSHAPE,
 	STAMP
 };
+
+
+
 
 
 void GameLoop()
@@ -66,7 +71,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 	// This is the main message handler of the system.
 	PAINTSTRUCT paintStruct; // Used in WM_PAINT.
 	HDC hdc;        // Handle to a device context.
+
 	static ESHAPE currentShape = FREEHAND;
+
 	static int currentPolygonPoints = 0;
 	
 	switch (message)
@@ -82,12 +89,96 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 		return (0);
 	}
 	break;
+
 	case WM_PAINT:
 	{
 		hdc = BeginPaint(hwnd, &paintStruct);
 
+		// Set Pen here
+		// HGDIOBJ original = NULL; // initialize original object here
+
+		// Save original
+		// original = SelectObject(hdc, GetStockObject(DC_PEN));
+
+
+		// Select pen
+		// SelectObject(hdc, GetStockObject(DC_PEN));
+		// Set Pen color
+
+		//switch (currentPenColor)
+		//{
+		//case BLACKPEN:
+		//{
+		//	SetDCPenColor(hdc, RGB(0, 0, 0));
+		//	break;
+		//}
+		//case WHITEPEN:
+		//{
+		//	SetDCPenColor(hdc, RGB(255, 255, 255));
+		//	break;
+		//}
+		//case REDPEN:
+		//{
+		//	SetDCPenColor(hdc, RGB(255, 0, 0));
+		//	break;
+		//}
+		//case GREENPEN:
+		//{
+		//	SetDCPenColor(hdc, RGB(0, 255, 0));
+		//	break;
+		//}
+		//case BLUEPEN:
+		//{
+		//	SetDCPenColor(hdc, RGB(0, 0, 255));
+		//	break;
+		//}
+		//default:
+		//	SetDCPenColor(hdc, RGB(255, 255, 255)); // Set brush black		
+		//}
+
+
+		// Select Brush
+		// SelectObject(hdc, GetStockObject(DC_BRUSH));
+		// Set Brush color
+
+		//switch (currentBrushColor)
+		//{
+		//
+		//case BLACKBRUSH:
+		//{
+		//	SetDCBrushColor(hdc, RGB(0, 0, 0));
+		//	break;
+		//}
+		//case WHITEBRUSH:
+		//{
+		//	SetDCBrushColor(hdc, RGB(255, 255, 255));
+		//	break;
+		//}
+		//case REDBRUSH:
+		//{
+		//	SetDCBrushColor(hdc, RGB(255, 0, 0)); // Set brush red
+		//	break;
+		//}
+		//case GREENBRUSH:
+		//{
+		//	SetDCBrushColor(hdc, RGB(0, 255, 0));
+		//	break;
+		//}
+		//case BLUEBRUSH:
+		//{
+		//	SetDCBrushColor(hdc, RGB(0, 0, 255));
+		//	break;
+		//}
+		//default:
+		//	SetDCBrushColor(hdc, RGB(0, 0, 0)); // Set brush white
+		//}
+
+		
+
 		if(globalCanvas != nullptr)
 		globalCanvas->Draw(mouseX, mouseY);
+
+		// SelectObject(hdc, original);
 		
 		EndPaint(hwnd, &paintStruct);
 		// Return Success.
@@ -132,7 +223,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			{
 				if (!globalShape)
 				{
-					globalShape = new myShape::Line(PS_SOLID, 1, RGB(0, 0, 0), mouseX, mouseY); 
+					globalShape = new myShape::Line(PS_SOLID, 1, penColor, mouseX, mouseY); 
 					globalCanvas->AddShape(globalShape);
 				}
 			}
@@ -142,7 +233,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			{
 				if (!globalShape)
 				{
-					globalShape = new myShape::Rectangle(NOSTYLE, 1, RGB(0, 0, 0), 0, RGB(0, 0, 0), mouseX, mouseY);
+					globalShape = new myShape::Rectangle(NOSTYLE, 1, brushColor, 0, penColor, mouseX, mouseY);
 					globalShape->SetEndX(mouseX);
 					globalShape->SetEndY(mouseY);
 					globalCanvas->AddShape(globalShape);
@@ -154,7 +245,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			{
 				if (!globalShape)
 				{
-					globalShape = new myShape::Ellipse(RGB(0, 0, 0), mouseX, mouseY);
+					globalShape = new myShape::Ellipse(penColor, brushColor, mouseX, mouseY);
 					globalShape->SetEndX(mouseX);
 					globalShape->SetEndY(mouseY);
 					globalCanvas->AddShape(globalShape);
@@ -166,7 +257,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			{
 				if (!globalShape)
 				{
-					globalShape = new myShape::Polygon(1, RGB(0, 0, 0), 1, RGB(0, 0, 0), 1);
+					globalShape = new myShape::Polygon(1, brushColor, 1, penColor, 1);
 					globalShape->SetEndX(mouseX);
 					globalShape->SetEndY(mouseY);
 					globalCanvas->AddShape(globalShape); // TODO Add Points somewhere
@@ -269,6 +360,68 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			currentShape = ESHAPE::POLYGONSHAPE;
 			break;
 		}
+
+
+
+		case ID_PENCOLOR_BLACK:
+		{
+			penColor = RGB(0, 0, 0);
+			break;
+		}
+		case ID_PENCOLOR_WHITE:
+		{
+			penColor = RGB(255, 255, 255);
+			break;
+		}
+		case ID_PENCOLOR_RED:
+		{
+			penColor = RGB(255, 0, 0);
+			break;
+		}
+		case ID_PENCOLOR_GREEN:
+		{
+			break;
+		}
+		case ID_PENCOLOR_BLUE:
+		{
+			break;
+		}
+
+
+
+		case ID_BRUSHCOLOR_WHITE:
+		{
+			brushColor = RGB(0, 0, 0);
+			break;
+		}
+		case ID_BRUSHCOLOR_BLACK:
+		{
+			brushColor = RGB(255, 255, 255);
+			break;
+		}
+		case ID_BRUSHCOLOR_RED:
+		{
+			brushColor = RGB(255, 0, 0);
+			break;
+		}
+		case ID_BRUSHCOLOR_GREEN:
+		{
+			break;
+		}
+		case ID_BRUSHCOLOR_BLUE:
+		{
+			break;
+		}
+		
+			
+			
+			
+			
+			
+			
+			
+			
+			
 
 
 		default:

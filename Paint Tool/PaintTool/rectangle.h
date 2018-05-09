@@ -50,8 +50,7 @@ namespace myShape
 		int hatchStyle;
 		COLORREF fillColor;
 		int penStyle;
-		int penColor;
-		COLORREF color;
+		COLORREF penColor;
 	};
 }
 

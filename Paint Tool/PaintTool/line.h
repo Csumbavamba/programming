@@ -27,7 +27,7 @@ namespace myShape
 	{
 	public:
 		//Line(int _iStartX, int _iStartY, int _iEndX, int _iEndY, COLORREF _newColour, int _iStyle, int _iWidth); 
-		Line(int style, int width, COLORREF newColour, int startX, int startY);
+		Line(int style, int width, COLORREF newColor, int startX, int startY);
 		Line();
 		virtual ~Line();
 
@@ -39,7 +39,7 @@ namespace myShape
 
 		int style;
 		int width;
-		COLORREF colour;
+		COLORREF color;
 	};
 }
 

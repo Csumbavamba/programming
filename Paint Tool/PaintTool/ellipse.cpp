@@ -1,8 +1,9 @@
 #include "ellipse.h"
 
-myShape::Ellipse::Ellipse(COLORREF newColor, int x, int y)
+myShape::Ellipse::Ellipse(COLORREF penColor, COLORREF fillColor, int x, int y)
 {
-	color = newColor;
+	this->penColor = penColor;
+	this->fillColor = fillColor;
 	startX = x;
 	startY = y;
 }
@@ -17,6 +18,18 @@ myShape::Ellipse::~Ellipse()
 
 void myShape::Ellipse::Draw(HDC hdc)
 {
+
+	SelectObject(hdc, GetStockObject(DC_PEN));
+
+	SetDCPenColor(hdc, penColor);
+	
+
+
+	SelectObject(hdc, GetStockObject(DC_BRUSH));
+
+	SetDCBrushColor(hdc, fillColor);
+
+
 	::Ellipse(hdc, startX, startY, endX, endY);
 }
 

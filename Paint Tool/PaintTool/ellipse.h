@@ -27,7 +27,7 @@ namespace myShape
 	class Ellipse : public IShape
 	{
 	public:
-		Ellipse(COLORREF newColor, int x, int y);
+		Ellipse(COLORREF penColor, COLORREF fillColor, int x, int y);
 		Ellipse();
 		virtual ~Ellipse();
 
@@ -36,7 +36,8 @@ namespace myShape
 
 
 	private:
-		COLORREF color;
+		COLORREF penColor;
+		COLORREF fillColor;
 	};
 }
 
