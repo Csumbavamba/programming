@@ -22,9 +22,9 @@ public:
 	BackBuffer();
 	~BackBuffer();
 
-	bool Initialise(HWND _hWnd, int _iWidth, int _iHeight);
+	bool Initialise(HWND hwnd, int width, int height);
 
-	HDC GetBFDC() const;
+	HDC GetBufferHDC() const;
 
 	int GetHeight() const;
 	int GetWidth() const;
@@ -37,12 +37,12 @@ private:
 	BackBuffer& operator = (const BackBuffer&);
 
 private:
-	HWND m_hWnd;
-	HDC m_BFDC;  //Handle to the in-memory DC for holding the backbuffer 
-	HBITMAP m_hBFBitmap; //handle to the bitmap that represents the backbuffer
-	HBITMAP m_hOldBitmap; //Used in select object to save the old bitmap.
-	int m_iWidth;
-	int m_iHeight;
+	HWND hwnd;
+	HDC bufferHDC;  //Handle to the in-memory DC for holding the backbuffer 
+	HBITMAP bufferBitmap; //handle to the bitmap that represents the backbuffer
+	HBITMAP oldBufferBitmap; //Used in select object to save the old bitmap.
+	int width;
+	int height;
 
 
 };

@@ -46,7 +46,7 @@ public:
 	void AddStamp(Stamp*);
 	
 private:
-	BackBuffer* backBuffer; // A canvas has a backbuffer.
+	BackBuffer* backBuffer = nullptr; // A canvas has a backbuffer.
 	std::vector<Stamp*> vectorOfStamps;
 	std::vector<IShape*> vectorOfShapes;
 	HWND hwnd;

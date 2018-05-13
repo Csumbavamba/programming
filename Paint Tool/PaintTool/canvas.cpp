@@ -1,5 +1,6 @@
 #include "canvas.h"
 #include "shape.h"
+#include "backBuffer.h"
 
 Canvas::Canvas()
 {
@@ -11,31 +12,36 @@ Canvas::~Canvas()
 	{
 		delete vectorOfShapes.at(i);
 	}
+
+	delete backBuffer;
 }
 
 bool Canvas::Initialise(HWND hwnd, int width, int height)
 {
 	this->hwnd = hwnd;
+
+	backBuffer = new BackBuffer();
+	backBuffer->Initialise(hwnd, width, height);
+	
 	return false;
 }
 
 BackBuffer * Canvas::GetBackBuffer()
 {
-	return nullptr;
+	return backBuffer;
 }
 
 bool Canvas::Draw(int mouseX, int mouseY)
 {
-	HDC hdc = GetDC(hwnd);
 
-	// Draw between these two
+
 	for (IShape * shape : vectorOfShapes)
 	{
-		shape->Draw(hdc);
+		shape->Draw(backBuffer->GetBufferHDC());
+		// shape->Draw(hdc);
 	}
 
-
-	ReleaseDC(hwnd, hdc);
+	
 	return false;
 }
 

@@ -26,17 +26,30 @@ myShape::Polygon::~Polygon()
 
 void myShape::Polygon::Draw(HDC hdc)
 {
-	SelectObject(hdc, GetStockObject(DC_PEN));
 
-	SetDCPenColor(hdc, penColor);
+	HPEN customisedPen = CreatePen(penStyle, penWidth, penColor);
+	SelectObject(hdc, customisedPen);
 
+	HBRUSH customisedBrush;
 
+	if (hatchStyle == -1)
+	{
+		// Create Solid Brush
+		customisedBrush = CreateSolidBrush(fillColor);
+	}
+	else
+	{
+		// Create Hatched Brush
+		customisedBrush = CreateHatchBrush(hatchStyle, fillColor);
 
-	SelectObject(hdc, GetStockObject(DC_BRUSH));
+	}
 
-	SetDCBrushColor(hdc, fillColor);
+	SelectObject(hdc, customisedBrush);
 
 	::Polygon(hdc, pointList, points);
+
+	DeleteObject(customisedPen);
+	DeleteObject(customisedBrush);
 }
 
 void myShape::Polygon::SetFillColor(COLORREF newColor)

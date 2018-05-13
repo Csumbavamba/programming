@@ -35,8 +35,15 @@ Canvas* globalCanvas;
 IShape* globalShape = nullptr;
 HMENU globalMenu;
 myShape::Polygon * polygon;
+int currentPolygonPoints = 0;
 COLORREF penColor = RGB(0, 0, 0);
 COLORREF brushColor = RGB(255, 255, 255);
+int penWidth = 1;
+int penStyle = PS_SOLID;
+int hatchStyle = -1;
+BRUSHSTYLE brushStyle = NOSTYLE;
+CHOOSECOLOR chosenColor;
+COLORREF customColors[16];
 
 // bool mouseDown = false;
 int mouseX, mouseY;
@@ -54,13 +61,32 @@ enum ESHAPE
 
 
 
+void AddPolygonPoint()
+{
+	polygon = dynamic_cast<myShape::Polygon*>(globalShape);
 
+	polygon->SetEndX(mouseX);
+	polygon->SetEndY(mouseY);
+
+	POINT * point = new POINT();
+	polygon->AddPoint(point);
+	currentPolygonPoints++;
+}
 
 void GameLoop()
 {
 	globalCanvas->Draw(mouseX, mouseY);
 	
 	//One frame of game logic occurs here...
+}
+
+void CheckSelectedMenuItem(int selectedMenuItem, int& lastMenuItem)
+{
+	if (lastMenuItem != 0)
+		CheckMenuItem(globalMenu, lastMenuItem, MF_UNCHECKED);
+
+	CheckMenuItem(globalMenu, selectedMenuItem, MF_CHECKED);
+	lastMenuItem = selectedMenuItem;
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd,
@@ -74,7 +100,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 
 	static ESHAPE currentShape = FREEHAND;
 
-	static int currentPolygonPoints = 0;
+	static int lastSelectedMenuItem;
 	
 	switch (message)
 	{
@@ -84,6 +110,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 		
 		globalCanvas = new Canvas();
 		globalCanvas->Initialise(hwnd, 1500, 800);
+		// globalCanvas->GetBackBuffer()->Initialise(hwnd, 1500, 800);
+
+		// Initialize choosecolor
+		ZeroMemory(&chosenColor, sizeof(chosenColor));
+		chosenColor.lStructSize = sizeof(chosenColor);
+		chosenColor.hwndOwner = hwnd;
+		chosenColor.lpCustColors = (LPDWORD)customColors;
+		chosenColor.rgbResult = penColor;
+		chosenColor.Flags = CC_FULLOPEN || CC_RGBINIT;
 
 		// Return Success.
 		return (0);
@@ -94,92 +129,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 	{
 		hdc = BeginPaint(hwnd, &paintStruct);
 
-		// Set Pen here
-		// HGDIOBJ original = NULL; // initialize original object here
-
-		// Save original
-		// original = SelectObject(hdc, GetStockObject(DC_PEN));
-
-
-		// Select pen
-		// SelectObject(hdc, GetStockObject(DC_PEN));
-		// Set Pen color
-
-		//switch (currentPenColor)
-		//{
-		//case BLACKPEN:
-		//{
-		//	SetDCPenColor(hdc, RGB(0, 0, 0));
-		//	break;
-		//}
-		//case WHITEPEN:
-		//{
-		//	SetDCPenColor(hdc, RGB(255, 255, 255));
-		//	break;
-		//}
-		//case REDPEN:
-		//{
-		//	SetDCPenColor(hdc, RGB(255, 0, 0));
-		//	break;
-		//}
-		//case GREENPEN:
-		//{
-		//	SetDCPenColor(hdc, RGB(0, 255, 0));
-		//	break;
-		//}
-		//case BLUEPEN:
-		//{
-		//	SetDCPenColor(hdc, RGB(0, 0, 255));
-		//	break;
-		//}
-		//default:
-		//	SetDCPenColor(hdc, RGB(255, 255, 255)); // Set brush black		
-		//}
-
-
-		// Select Brush
-		// SelectObject(hdc, GetStockObject(DC_BRUSH));
-		// Set Brush color
-
-		//switch (currentBrushColor)
-		//{
-		//
-		//case BLACKBRUSH:
-		//{
-		//	SetDCBrushColor(hdc, RGB(0, 0, 0));
-		//	break;
-		//}
-		//case WHITEBRUSH:
-		//{
-		//	SetDCBrushColor(hdc, RGB(255, 255, 255));
-		//	break;
-		//}
-		//case REDBRUSH:
-		//{
-		//	SetDCBrushColor(hdc, RGB(255, 0, 0)); // Set brush red
-		//	break;
-		//}
-		//case GREENBRUSH:
-		//{
-		//	SetDCBrushColor(hdc, RGB(0, 255, 0));
-		//	break;
-		//}
-		//case BLUEBRUSH:
-		//{
-		//	SetDCBrushColor(hdc, RGB(0, 0, 255));
-		//	break;
-		//}
-		//default:
-		//	SetDCBrushColor(hdc, RGB(0, 0, 0)); // Set brush white
-		//}
-
-		
 
 		if(globalCanvas != nullptr)
 		globalCanvas->Draw(mouseX, mouseY);
-
-		// SelectObject(hdc, original);
 		
+
 		EndPaint(hwnd, &paintStruct);
 		// Return Success.
 		return (0);
@@ -191,14 +145,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 		if (currentShape == POLYGONSHAPE && globalShape != nullptr)
 		{
 
-			polygon = dynamic_cast<myShape::Polygon*>(globalShape);
-
-			polygon->SetEndX(mouseX);
-			polygon->SetEndY(mouseY);
-
-			POINT * point = new POINT();
-			polygon->AddPoint(point);
-			currentPolygonPoints++;
+			AddPolygonPoint();
 		}
 		return (0);
 	}
@@ -223,7 +170,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			{
 				if (!globalShape)
 				{
-					globalShape = new myShape::Line(PS_SOLID, 1, penColor, mouseX, mouseY); 
+					globalShape = new myShape::Line(penStyle, penWidth, penColor, mouseX, mouseY); 
 					globalCanvas->AddShape(globalShape);
 				}
 			}
@@ -233,10 +180,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			{
 				if (!globalShape)
 				{
-					globalShape = new myShape::Rectangle(NOSTYLE, 1, brushColor, 0, penColor, mouseX, mouseY);
-					globalShape->SetEndX(mouseX);
+					globalShape = new myShape::Rectangle(brushStyle, hatchStyle, brushColor, penStyle, penColor, mouseX, mouseY);
+					globalShape->SetEndX(mouseX); 
 					globalShape->SetEndY(mouseY);
-					globalCanvas->AddShape(globalShape);
+					globalCanvas->AddShape(globalShape); // TODO simplify method (setEndXY + Add shape can be called after switch)
 				}
 			}
 			break;
@@ -245,7 +192,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			{
 				if (!globalShape)
 				{
-					globalShape = new myShape::Ellipse(penColor, brushColor, mouseX, mouseY);
+					globalShape = new myShape::Ellipse(hatchStyle, penStyle, penColor, brushColor, mouseX, mouseY);
 					globalShape->SetEndX(mouseX);
 					globalShape->SetEndY(mouseY);
 					globalCanvas->AddShape(globalShape);
@@ -257,10 +204,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			{
 				if (!globalShape)
 				{
-					globalShape = new myShape::Polygon(1, brushColor, 1, penColor, 1);
+					globalShape = new myShape::Polygon(hatchStyle, brushColor, penStyle, penColor, penWidth);
 					globalShape->SetEndX(mouseX);
 					globalShape->SetEndY(mouseY);
-					globalCanvas->AddShape(globalShape); // TODO Add Points somewhere
+					globalCanvas->AddShape(globalShape); 
+					if (currentPolygonPoints == 0)
+						AddPolygonPoint();
 
 				}
 			}
@@ -328,6 +277,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 
 	case WM_COMMAND:
 	{
+
+		
+
 		switch (LOWORD(wParam))
 		{
 		case ID_FILE_EXIT:
@@ -340,8 +292,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			MessageBox(hwnd, L"This paint tool was developed by .............", L"Zsombor Pirok", MB_OK | MB_ICONINFORMATION);
 			break;
 		}
+
+		// SHAPES
 		case ID_SHAPE_LINE:
 		{
+			
 			currentShape = ESHAPE::LINESHAPE;
 			break;
 		}
@@ -362,54 +317,93 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 		}
 
 
-
-		case ID_PENCOLOR_BLACK:
+		// PEN COLOR
+		case ID_PEN_COLOR:
 		{
-			penColor = RGB(0, 0, 0);
+			ChooseColor(&chosenColor);
+			penColor = chosenColor.rgbResult;
 			break;
 		}
-		case ID_PENCOLOR_WHITE:
-		{
-			penColor = RGB(255, 255, 255);
-			break;
-		}
-		case ID_PENCOLOR_RED:
-		{
-			penColor = RGB(255, 0, 0);
-			break;
-		}
-		case ID_PENCOLOR_GREEN:
-		{
-			break;
-		}
-		case ID_PENCOLOR_BLUE:
-		{
-			break;
-		}
+		
 
 
+		// PEN WIDTH FOR LINE
+		case ID_WIDTH_1:
+		{
+			penWidth = 1;
+			break;
+		}
+		case ID_WIDTH_2:
+		{
+			penWidth = 2;
+			break;
+		}
+		case ID_WIDTH_3:
+		{
+			penWidth = 3;
+			break;
+		}
 
-		case ID_BRUSHCOLOR_WHITE:
+		// PEN STYLE
+		case ID_STYLE_INVISIBLE:
 		{
-			brushColor = RGB(0, 0, 0);
+			penStyle = PS_NULL;
 			break;
 		}
-		case ID_BRUSHCOLOR_BLACK:
+		case ID_STYLE_SOLID:
 		{
-			brushColor = RGB(255, 255, 255);
+			penStyle = PS_SOLID;
 			break;
 		}
-		case ID_BRUSHCOLOR_RED:
+		case  ID_STYLE_DASHED:
 		{
-			brushColor = RGB(255, 0, 0);
+			penStyle = PS_DASH;
 			break;
 		}
-		case ID_BRUSHCOLOR_GREEN:
+		case ID_STYLE_DOTTED:
 		{
+			penStyle = PS_DOT;
 			break;
 		}
-		case ID_BRUSHCOLOR_BLUE:
+
+
+		// BRUSH COLOR
+		case ID_BRUSH_COLOR:
 		{
+			ChooseColor(&chosenColor);
+			brushColor = chosenColor.rgbResult;
+			break;
+		}
+
+		// Brush style
+		case ID_STYLE_NOHATCH:
+		{
+			brushStyle = NOSTYLE;
+			hatchStyle = -1;
+			break;
+		}
+		case ID_STYLE_DIAGONAL:
+		{
+			brushStyle = HATCH;
+			hatchStyle = HS_BDIAGONAL;
+			break;
+		}
+		case ID_STYLE_CROSS:
+		{
+			brushStyle = HATCH;
+			hatchStyle = HS_CROSS;
+			break;
+		}
+		case ID_STYLE_HORIZONTALHATCH:
+		{
+			brushStyle = HATCH;
+			hatchStyle = HS_HORIZONTAL;
+			break;
+		}
+		case ID_STYLE_VERTICALHATCH:
+		{
+			brushStyle = HATCH;
+			hatchStyle = HS_VERTICAL;
 			break;
 		}
 		
@@ -427,6 +421,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 		default:
 			break;
 		}
+
+		CheckSelectedMenuItem(LOWORD(wParam), lastSelectedMenuItem);
+
+
 		return(0);
 	}
 	break;

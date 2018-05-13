@@ -24,18 +24,30 @@ myShape::Rectangle::~Rectangle()
 
 void myShape::Rectangle::Draw(HDC hdc)
 {
-	SelectObject(hdc, GetStockObject(DC_PEN));
+	HPEN customisedPen = CreatePen(penStyle, 1, penColor);
+	SelectObject(hdc, customisedPen);
 
-	SetDCPenColor(hdc, penColor);
+	HBRUSH customisedBrush;
+
+	if (brushStyle == BRUSHSTYLE::NOSTYLE)
+	{
+		// Create Solid Brush
+		customisedBrush = CreateSolidBrush(fillColor);
+	}
+	else
+	{
+		// Create Hatched Brush
+		customisedBrush = CreateHatchBrush(hatchStyle, fillColor);
+		
+	}
 
 
-	SelectObject(hdc, GetStockObject(DC_BRUSH));
+	SelectObject(hdc, customisedBrush);
 
-	SetDCBrushColor(hdc, fillColor);
-
-
-	//MoveToEx(hdc, startX, startY, NULL); // Draw Rectangle
 	::Rectangle(hdc, startX, startY, endX, endY);
+
+	DeleteObject(customisedPen);
+	DeleteObject(customisedBrush);
 
 }
 

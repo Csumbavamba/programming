@@ -19,12 +19,13 @@ myShape::Line::~Line()
 
 void myShape::Line::Draw(HDC hdc)
 {
-	SelectObject(hdc, GetStockObject(DC_PEN));
-
-	SetDCPenColor(hdc, color);
+	HPEN customisedPen = CreatePen(style, width, color);
+	SelectObject(hdc, customisedPen);
 
 	MoveToEx(hdc, startX, startY, NULL); // Draw the line... 
 	LineTo(hdc, endX, endY);
+
+	DeleteObject(customisedPen);
 }
 
 void myShape::Line::SetWidth(int width)
