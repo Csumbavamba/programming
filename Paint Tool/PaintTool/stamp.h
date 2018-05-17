@@ -25,13 +25,13 @@ public:
 	Stamp(HINSTANCE hInstance, wchar_t* filename, int, int );
 	virtual ~Stamp();
 
-	virtual void Draw(HDC _hdc);
+	virtual void Draw(HDC hdc);
 	void SetStartX(int _iX);
 	void SetStartY(int _iY);
 
 private:
-	HBITMAP m_hBitMap;
-	BITMAP m_bitmapStructure;
+	HBITMAP bitMap;
+	BITMAP bitMapStructure;
 };
 
 #endif

@@ -158,9 +158,13 @@
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="shape.cpp" />
+    <ClCompile Include="stamp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PaintTool.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Assets\carrots.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

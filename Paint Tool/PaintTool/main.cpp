@@ -157,6 +157,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 
 			AddPolygonPoint();
 		}
+		if (currentShape != POLYGONSHAPE)
+		{
+			globalCanvas->RemoveShape();
+		}
 		return (0);
 	}
 
@@ -182,6 +186,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 				if (!globalShape)
 				{
 					globalShape = new myShape::Line(penStyle, penWidth, penColor, mouseX, mouseY);
+					globalCanvas->AddShape(globalShape);
 				}
 			}
 			break;
@@ -191,6 +196,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 				if (!globalShape)
 				{
 					globalShape = new myShape::Rectangle(brushStyle, hatchStyle, brushColor, penStyle, penColor, mouseX, mouseY);
+					globalCanvas->AddShape(globalShape);
 				}
 			}
 			break;
@@ -200,6 +206,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 				if (!globalShape)
 				{
 					globalShape = new myShape::Ellipse(hatchStyle, penStyle, penColor, brushColor, mouseX, mouseY);
+					globalCanvas->AddShape(globalShape);
 				}
 			}
 			break;
@@ -209,9 +216,20 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 				if (!globalShape)
 				{
 					globalShape = new myShape::Polygon(hatchStyle, brushColor, penStyle, penColor, penWidth);
+					globalCanvas->AddShape(globalShape);
 					if (currentPolygonPoints == 0)
 						AddPolygonPoint();
 
+				}
+			}
+			break;
+
+			case STAMP:
+			{
+				if (!globalShape)
+				{
+					globalShape = new Stamp(globalHandleToInstance, MAKEINTRESOURCE(IDB_BITMAP1), mouseX, mouseY);
+					globalCanvas->AddShape(globalShape);
 				}
 			}
 			break;
@@ -226,7 +244,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			{
 				globalShape->SetEndX(mouseX);
 				globalShape->SetEndY(mouseY);
-				globalCanvas->AddShape(globalShape);
+				
 			}
 			
 			// lastShape = globalShape; TODO create an erase function
@@ -324,6 +342,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			currentShape = ESHAPE::POLYGONSHAPE;
 			break;
 		}
+		case ID_ADD_STAMP:
+		{
+			currentShape = ESHAPE::STAMP;
+			break;
+		}
 
 
 		// PEN COLOR
@@ -419,7 +442,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			
 			
 			
-			
+		case ID_FILE_SAVE:
+		{
+			globalCanvas->Save(hwnd);
+			break;
+		}
+		case ID_FILE_OPEN:
+		{
+			break;
+		}
 			
 			
 			

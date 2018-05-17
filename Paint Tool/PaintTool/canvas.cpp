@@ -50,11 +50,21 @@ bool Canvas::Draw()
 
 void Canvas::Save(HWND hwnd)
 {
+	
 }
 
 void Canvas::AddShape(IShape * shape)
 {
 	vectorOfShapes.push_back(shape);
+}
+
+void Canvas::RemoveShape()
+{
+	if (!vectorOfShapes.empty())
+	{
+		vectorOfShapes.pop_back();
+	}
+	
 }
 
 void Canvas::AddStamp(Stamp * stamp)

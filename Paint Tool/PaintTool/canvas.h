@@ -43,6 +43,7 @@ public:
 	bool Draw();
 	void Save(HWND hwnd);
 	void AddShape(IShape*);
+	void RemoveShape();
 	void AddStamp(Stamp*);
 	
 private:
