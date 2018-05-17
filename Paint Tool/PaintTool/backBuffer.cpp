@@ -2,52 +2,48 @@
 
 BackBuffer::BackBuffer()
 {
+	hwnd = NULL;
+	bufferHDC = NULL;
+	bufferBitmap = NULL;
+	width = NULL;
+	height = NULL;
 }
 
 BackBuffer::~BackBuffer()
 {
-	
+	// Do cleanup here
+	SelectObject(bufferHDC, oldBufferBitmap);
+	DeleteObject(bufferBitmap);
+	DeleteDC(bufferHDC);
 }
 
 bool BackBuffer::Initialise(HWND hwnd, int width, int height)
 {
+
+	// Initialize the main variables
 	this->hwnd = hwnd;
 
-	this->width = width;
-	this->height = height;
-
-	bufferHDC = GetDC(hwnd);
-
-	// TODO FIX BACKBUFFER
+	// this->width = width;
+	// this->height = height;
 
 
-	HDC compatibleHDC = CreateCompatibleDC(bufferHDC);
-	// Create the HBITMAP "canvas", or surface on which we will draw.
-	bufferBitmap = CreateCompatibleBitmap(bufferHDC, width, height);
+	RECT desktop;
+	const HWND handleToDesktop = GetDesktopWindow();
+	GetWindowRect(handleToDesktop, &desktop);
+	this->width = desktop.right;
+	this->height = desktop.bottom;
 
-	oldBufferBitmap = static_cast<HBITMAP>(SelectObject(compatibleHDC, bufferBitmap));
+	HDC compatibleHDC = GetDC(hwnd);
 
-	BitBlt(
-		bufferHDC, // Destination HDC
-		0,
-		0,
-		width,
-		height,
-		compatibleHDC, // Source HDC
-		0,
-		0,
-		SRCCOPY
-	);
+	bufferHDC = CreateCompatibleDC(compatibleHDC);
+	bufferBitmap = CreateCompatibleBitmap(compatibleHDC, desktop.right, desktop.bottom);
 
-	SelectObject(compatibleHDC, oldBufferBitmap);
+	oldBufferBitmap = static_cast<HBITMAP>(SelectObject(bufferHDC, bufferBitmap));
 
-	DeleteObject(oldBufferBitmap);
+	ReleaseDC(hwnd, compatibleHDC);
 
-	DeleteDC(compatibleHDC);
-
-
-
-	ReleaseDC(hwnd, bufferHDC);
+	// Clear buffer after drawing
+	Clear();
 
 	return true;
 }
@@ -69,14 +65,29 @@ int BackBuffer::GetWidth() const
 
 void BackBuffer::Clear()
 {
+	HBRUSH oldBrush = static_cast<HBRUSH>(SelectObject(bufferHDC, GetStockObject(WHITE_BRUSH)));
+	RECT rect;
+
+	
+
+	rect.top = 0;
+	rect.left = 0;
+	rect.right = width;
+	rect.bottom = height;
+
+	FillRect(bufferHDC, &rect, oldBrush);
+	SelectObject(bufferHDC, oldBrush);
 }
 
 void BackBuffer::Present()
 {
+	// Get the image on the screen
+	RECT rect;
+	GetClientRect(hwnd, &rect);
 	
-}
+	HDC hdc = GetDC(hwnd);
 
-//BackBuffer & BackBuffer::operator=(const BackBuffer &)
-//{
-//	// TODO: insert return statement here
-//}
+	BitBlt(hdc, 0, 0, rect.right, rect.bottom, bufferHDC, 0, 0, SRCCOPY);
+
+	ReleaseDC(hwnd, hdc);
+}

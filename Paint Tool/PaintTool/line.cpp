@@ -7,6 +7,8 @@ myShape::Line::Line(int style, int width, COLORREF newColor, int startX, int sta
 	color = newColor;
 	this->startX = startX;
 	this->startY = startY;
+	endX = startX;
+	endY = startY;
 }
 
 myShape::Line::Line()

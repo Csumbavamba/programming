@@ -31,10 +31,10 @@
 
 //Global variables
 HINSTANCE globalHandleToInstance;
-Canvas* globalCanvas;
+Canvas* globalCanvas = nullptr;
 IShape* globalShape = nullptr;
 HMENU globalMenu;
-myShape::Polygon * polygon;
+myShape::Polygon * polygon = nullptr;
 int currentPolygonPoints = 0;
 COLORREF penColor = RGB(0, 0, 0);
 COLORREF brushColor = RGB(255, 255, 255);
@@ -44,6 +44,7 @@ int hatchStyle = -1;
 BRUSHSTYLE brushStyle = NOSTYLE;
 CHOOSECOLOR chosenColor;
 COLORREF customColors[16];
+
 
 // bool mouseDown = false;
 int mouseX, mouseY;
@@ -60,6 +61,14 @@ enum ESHAPE
 };
 
 
+void GameLoop()
+{
+	if (globalCanvas != nullptr)
+	{
+		globalCanvas->Draw();
+	}
+	
+}
 
 void AddPolygonPoint()
 {
@@ -73,12 +82,6 @@ void AddPolygonPoint()
 	currentPolygonPoints++;
 }
 
-void GameLoop()
-{
-	globalCanvas->Draw(mouseX, mouseY);
-	
-	//One frame of game logic occurs here...
-}
 
 void CheckSelectedMenuItem(int selectedMenuItem, int& lastMenuItem)
 {
@@ -101,14 +104,21 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 	static ESHAPE currentShape = FREEHAND;
 
 	static int lastSelectedMenuItem;
+	static RECT rect;
 	
 	switch (message)
 	{
 	case WM_CREATE:
 	{
 		// Do initialization stuff here.
+
+
 		
 		globalCanvas = new Canvas();
+
+		// Get client rect
+		GetClientRect(hwnd, &rect);
+
 		globalCanvas->Initialise(hwnd, 1500, 800);
 		// globalCanvas->GetBackBuffer()->Initialise(hwnd, 1500, 800);
 
@@ -130,8 +140,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 		hdc = BeginPaint(hwnd, &paintStruct);
 
 
-		if(globalCanvas != nullptr)
-		globalCanvas->Draw(mouseX, mouseY);
+		//if(globalCanvas != nullptr)
+		//globalCanvas->Draw();
 		
 
 		EndPaint(hwnd, &paintStruct);
@@ -153,6 +163,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 	case WM_RBUTTONDBLCLK:
 	{
 		globalShape = nullptr;
+
 		return (0);
 	}
 	break;
@@ -170,8 +181,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			{
 				if (!globalShape)
 				{
-					globalShape = new myShape::Line(penStyle, penWidth, penColor, mouseX, mouseY); 
-					globalCanvas->AddShape(globalShape);
+					globalShape = new myShape::Line(penStyle, penWidth, penColor, mouseX, mouseY);
 				}
 			}
 			break;
@@ -181,9 +191,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 				if (!globalShape)
 				{
 					globalShape = new myShape::Rectangle(brushStyle, hatchStyle, brushColor, penStyle, penColor, mouseX, mouseY);
-					globalShape->SetEndX(mouseX); 
-					globalShape->SetEndY(mouseY);
-					globalCanvas->AddShape(globalShape); // TODO simplify method (setEndXY + Add shape can be called after switch)
 				}
 			}
 			break;
@@ -193,9 +200,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 				if (!globalShape)
 				{
 					globalShape = new myShape::Ellipse(hatchStyle, penStyle, penColor, brushColor, mouseX, mouseY);
-					globalShape->SetEndX(mouseX);
-					globalShape->SetEndY(mouseY);
-					globalCanvas->AddShape(globalShape);
 				}
 			}
 			break;
@@ -205,9 +209,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 				if (!globalShape)
 				{
 					globalShape = new myShape::Polygon(hatchStyle, brushColor, penStyle, penColor, penWidth);
-					globalShape->SetEndX(mouseX);
-					globalShape->SetEndY(mouseY);
-					globalCanvas->AddShape(globalShape); 
 					if (currentPolygonPoints == 0)
 						AddPolygonPoint();
 
@@ -221,7 +222,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			}
 		
 			}
-			InvalidateRect(hwnd, NULL, TRUE);
+			if (globalShape)
+			{
+				globalShape->SetEndX(mouseX);
+				globalShape->SetEndY(mouseY);
+				globalCanvas->AddShape(globalShape);
+			}
+			
+			// lastShape = globalShape; TODO create an erase function
+
+			// InvalidateRect(hwnd, NULL, TRUE);
 			// Return success.
 			return (0);
 
@@ -237,8 +247,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 		if (globalShape)
 		{
 			globalShape->SetEndX(mouseX);
-			globalShape->SetEndY(mouseY);
-			//InvalidateRect(hwnd, NULL, TRUE);			
+			globalShape->SetEndY(mouseY);		
 		}
 
 		if (currentShape != POLYGONSHAPE)
@@ -266,7 +275,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			{
 				globalShape->SetEndX(mouseX);
 				globalShape->SetEndY(mouseY);
-				InvalidateRect(hwnd, NULL, TRUE);
+				// InvalidateRect(hwnd, NULL, TRUE);
 			}
 		}
 
@@ -434,6 +443,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 		PostQuitMessage(0);
 
 		delete globalCanvas;
+		globalCanvas = nullptr;
 
 		// Return success.
 		return (0);
@@ -518,7 +528,7 @@ int WINAPI WinMain(HINSTANCE handleToInstance,
 		}
 
 		// Main game processing goes here.
-		//GameLoop(); //One frame of game logic occurs here...
+		GameLoop(); //One frame of game logic occurs here...
 	}
 
 	// Return to Windows like this...

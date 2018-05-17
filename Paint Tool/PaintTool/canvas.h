@@ -40,7 +40,7 @@ public:
 	~Canvas();
 	bool Initialise(HWND hwnd, int width, int height);
 	BackBuffer* GetBackBuffer();
-	bool Draw(int mouseX, int mouseY);
+	bool Draw();
 	void Save(HWND hwnd);
 	void AddShape(IShape*);
 	void AddStamp(Stamp*);

@@ -4,6 +4,7 @@
 
 Canvas::Canvas()
 {
+	backBuffer = new BackBuffer();
 }
 
 Canvas::~Canvas()
@@ -13,17 +14,18 @@ Canvas::~Canvas()
 		delete vectorOfShapes.at(i);
 	}
 
-	delete backBuffer;
+	// delete backBuffer;
 }
 
 bool Canvas::Initialise(HWND hwnd, int width, int height)
 {
 	this->hwnd = hwnd;
 
-	backBuffer = new BackBuffer();
 	backBuffer->Initialise(hwnd, width, height);
+
+	//backBuffer->Clear();
 	
-	return false;
+	return true;
 }
 
 BackBuffer * Canvas::GetBackBuffer()
@@ -31,16 +33,17 @@ BackBuffer * Canvas::GetBackBuffer()
 	return backBuffer;
 }
 
-bool Canvas::Draw(int mouseX, int mouseY)
+bool Canvas::Draw()
 {
-
+	backBuffer->Clear();
 
 	for (IShape * shape : vectorOfShapes)
 	{
 		shape->Draw(backBuffer->GetBufferHDC());
-		// shape->Draw(hdc);
+			// shape->Draw(hdc);
 	}
-
+	
+	backBuffer->Present();
 	
 	return false;
 }
